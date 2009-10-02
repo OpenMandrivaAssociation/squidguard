@@ -57,7 +57,7 @@ Neither squidGuard nor Squid can be used to
 
 %prep
 
-%setup -q
+%setup -q -n %{rname}-%{version}
 
 # fix attribs
 find . -type d -perm 0750 -exec chmod 755 {} \;
