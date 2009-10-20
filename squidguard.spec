@@ -68,8 +68,8 @@ find . -type f -perm 0640 -exec chmod 644 {} \;
 %patch0 -p1
 %patch1 -p0
 %patch2 -p1
-%patch3 -p0 -b .20091015
 %patch4 -p0 -b .20091019
+%patch3 -p0 -b .20091015
 cp %{SOURCE6} %{rname}.logrotate
 
 %build
