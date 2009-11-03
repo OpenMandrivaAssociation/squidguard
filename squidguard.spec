@@ -175,7 +175,7 @@ chown -R squid:squid /usr/share/%{rname}-%{version}/db
 echo "WARNING !!! WARNING !!! WARNING !!! WARNING !!!"
 echo ""
 echo "Modify the following line in the /etc/squid/squid.conf file:"
-echo "redirect_program /usr/bin/squidGuard -c /etc/squid/squidGuard.conf"
+echo "url_rewrite_program /usr/bin/squidGuard -c /etc/squid/squidGuard.conf"
 
 %postun
 if [ "$1" = "0" ]; then
