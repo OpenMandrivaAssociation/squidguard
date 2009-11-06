@@ -6,7 +6,7 @@
 Summary:	Filter, redirector and access controller plugin for Squid
 Name:		squidguard
 Version:	1.4
-Release:	%mkrel 7
+Release:	%mkrel 8
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squidguard.org
@@ -19,9 +19,10 @@ Source5:	blacklist-update
 Source6:	%{rname}.logrotate
 Patch0:		squidGuard-1.2.0.default_dir.patch
 Patch1:		squidGuard-DESTDIR.diff
-Patch2:		squidGuard-1.4-dnsbl.patch
-Patch3:		squidGuard-1.4-20091015.patch
-Patch4:		squidGuard-1.4-20091019.patch
+Patch2:		squidGuard-1.4-make_default_config_work.diff
+Patch3:		squidGuard-1.4-dnsbl.patch
+Patch4:		squidGuard-1.4-CVE-2009-3700.diff
+Patch5:		squidGuard-1.4-CVE-2009-3826.diff
 BuildRequires:	bison 
 BuildRequires:	db4-devel
 BuildRequires:	flex
@@ -67,9 +68,11 @@ find . -type f -perm 0640 -exec chmod 644 {} \;
 
 %patch0 -p1
 %patch1 -p0
-%patch2 -p1
-%patch4 -p0 -b .20091019
-%patch3 -p0 -b .20091015
+%patch2 -p0
+%patch3 -p1
+%patch4 -p0 -b .CVE-2009-3700
+%patch5 -p1 -b .CVE-2009-3826
+
 cp %{SOURCE6} %{rname}.logrotate
 
 %build
