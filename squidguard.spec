@@ -6,7 +6,7 @@
 Summary:	Filter, redirector and access controller plugin for Squid
 Name:		squidguard
 Version:	1.4
-Release:	%mkrel 14
+Release:	%mkrel 15
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squidguard.org
@@ -27,7 +27,7 @@ Patch6:		squidGuard-1.4-quoted_string_support.diff
 Patch7:		squidGuard-1.4-specialchars.diff
 
 BuildRequires:	bison 
-BuildRequires:	db4-devel
+BuildRequires:	db-devel
 BuildRequires:	flex
 BuildRequires:	openldap-devel
 Requires:	squid 
