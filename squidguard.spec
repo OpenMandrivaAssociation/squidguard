@@ -6,7 +6,7 @@
 Summary:	Filter, redirector and access controller plugin for Squid
 Name:		squidguard
 Version:	1.4
-Release:	17
+Release:	18
 License:	GPL
 Group:		System/Servers
 URL:		http://www.squidguard.org
