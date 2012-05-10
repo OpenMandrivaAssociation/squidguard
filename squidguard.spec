@@ -1,13 +1,10 @@
 %define rname squidGuard
 
-%define _requires_exceptions perl(
-%define _provides_exceptions perl(
-
 Summary:	Filter, redirector and access controller plugin for Squid
 Name:		squidguard
 Version:	1.4
 Release:	18
-License:	GPL
+License:	GPLv2
 Group:		System/Servers
 URL:		http://www.squidguard.org
 Source0:	http://www.squidguard.org/Downloads/%{rname}-%{version}.tar.gz
