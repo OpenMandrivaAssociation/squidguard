@@ -3,7 +3,7 @@
 Summary:	Filter, redirector and access controller plugin for Squid
 Name:		squidguard
 Version:	1.4
-Release:	18
+Release:	19
 License:	GPLv2
 Group:		System/Servers
 URL:		http://www.squidguard.org
@@ -137,7 +137,7 @@ cd -
 
 cp -a contrib/hostbyname/hostbyname $Q/contrib/
 cp -a contrib/sgclean/sgclean $Q/contrib/
-cp -a contrib/squidGuardRobot/{squidGuardRobot,RobotUserAgent.pm} $Q/contrib/
+#cp -a contrib/squidGuardRobot/{squidGuardRobot,RobotUserAgent.pm} $Q/contrib/
 
 cp -a samples/dest $Q/samples
 cp -a samples/*{.conf,.cgi} $Q/samples
