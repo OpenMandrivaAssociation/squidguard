@@ -1,0 +1,8 @@
+sources:
+  "blacklists-readme:"	32b47fb2914b8cbad2b715689200d3f30b130a1b
+  "blacklist-update:"	5ba0c20f9044508de8b227da6a50473a4067622e
+  "nulbanner.png:"	01766f6e62a61d6968bf479d5f0283d509a12964
+  "squidGuard-1.4.tar.gz:"	0508ccb7db5c656b9952eacbcff2c956c01677d3
+  "squidGuard.cgi:"	27a8fb828f912eb7109d46fa9d439aca6a26c3a1
+  "squidGuard.conf.sample:"	bc34c91d47f44b482df891d3458a69d96f7021d2
+  "squidGuard.logrotate:"	577820a263f1d196aef11aca7dbe5b7c57f09043
