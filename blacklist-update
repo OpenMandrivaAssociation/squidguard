@@ -1,0 +1,190 @@
+#!/bin/bash
+#
+# squidGuard blacklist update script v1.3 (incomplete!)
+# http://www.bn-paf.de/filter/ - filter@bn-paf.de
+#
+# Todo (somebody wants to help?):
+# - notify if:
+#  downloaded files are broken
+#  squidGuard goes into emergency mode for some reason
+
+SQGDIR=/usr/share/squidGuard-1.1.4
+SQGLOG=/var/log/squidGuard/log
+CONFIG=/etc/squid/squidGuard/squidGuard.conf
+
+# Use "proxy" for Debian, otherwise usually "squid"
+USER=nobody
+
+# Copy blacklists locally for testing purposes
+# --- not implemented yet ---
+DEVEL=0
+
+# Workaround for some installations having problems with diffs
+TEXT=0
+
+
+
+if test -z $1;
+  then echo; echo Please specifiy what to update: all, diffs or custom; echo; exit;
+fi
+
+
+
+custom-update ()
+{ echo Compiling custom text files...
+  #/usr/local/squidGuard/bin/squidGuard -C  all -c $CONFIG 2>$SQGLOG/custom.log
+  /usr/bin/squidGuard -C  bad/domains -c $CONFIG 2>$SQGLOG/custom.log             
+  /usr/bin/squidGuard -C bad/urls -c $CONFIG 2>>$SQGLOG/custom.log      
+  /usr/bin/squidGuard -C good/domains -c $CONFIG 2>>$SQGLOG/custom.log     
+  /usr/bin/squidGuard -C good/urls    -c $CONFIG 2>>$SQGLOG/custom.log; }
+
+if test "$1" = custom; then custom-update; /usr/sbin/squid -k reconfigure; exit; fi
+
+
+
+dircreate  () { if test ! -d $1; then mkdir  $1; fi; }
+filecreate () { if test ! -f $1; then echo > $1; fi; }
+
+dircreate  $SQGDIR
+dircreate  $SQGDIR/db
+dircreate  $SQGDIR/db/custom
+dircreate  $SQGDIR/db/custom/bad
+filecreate $SQGDIR/db/custom/bad/domains
+filecreate $SQGDIR/db/custom/bad/urls
+dircreate  $SQGDIR/db/custom/good
+filecreate $SQGDIR/db/custom/good/domains
+filecreate $SQGDIR/db/custom/good/urls
+dircreate  $SQGDIR/tmp
+dircreate  $SQGLOG
+filecreate $SQGLOG/blocked.log
+
+
+
+rm -rf $SQGDIR/tmp/*
+cd $SQGDIR/tmp
+
+echo Downloading blacklists...
+
+if test "$1" = all -o ! -f ../blacklists.tar.gz; then
+  wget -nv ftp://ftp.ost.eltele.no/pub/www/proxy/squidGuard/contrib/blacklists.tar.gz
+  #cp $SQGDIR/devel/blacklists.tar.gz .
+  mv blacklists.tar.gz ..
+fi
+tar xfz ../blacklists.tar.gz
+
+wget -nv http://www.bn-paf.de/filter/de-blacklists.tar.gz
+#cp $SQGDIR/devel/de-blacklists.tar.gz .
+tar xfz de-blacklists.tar.gz
+
+wget -nv ftp://ftp.univ-tlse1.fr/pub/reseau/cache/squidguard_contrib/adult.tar.gz
+wget -nv ftp://ftp.univ-tlse1.fr/pub/reseau/cache/squidguard_contrib/publicite.tar.gz
+wget -nv ftp://ftp.univ-tlse1.fr/pub/reseau/cache/squidguard_contrib/redirector.tar.gz
+wget -nv ftp://ftp.univ-tlse1.fr/pub/reseau/cache/squidguard_contrib/warez.tar.gz
+#cp $SQGDIR/devel/adult.tar.gz .
+#cp $SQGDIR/devel/publicite.tar.gz .
+#cp $SQGDIR/devel/redirector.tar.gz .
+#cp $SQGDIR/devel/warez.tar.gz .
+mkdir fr-blacklists
+   cd fr-blacklists
+tar xfz ../adult.tar.gz
+tar xfz ../publicite.tar.gz
+tar xfz ../redirector.tar.gz
+tar xfz ../warez.tar.gz
+cd ..
+mv fr-blacklists/adult fr-blacklists/porn
+mv fr-blacklists/publicite fr-blacklists/ads
+mv fr-blacklists/redirector fr-blacklists/hacking
+
+wget -nv http://squidguard.mesd.k12.or.us/mesd-blacklists.tgz
+#cp $SQGDIR/devel/mesd-blacklists.tgz .
+tar xfz mesd-blacklists.tgz
+
+
+
+
+if ! test "$TEXT" = 1; then
+
+echo Compiling diffs...
+
+diffgen ()
+    { if test -f $1;
+        then sed 's/^/+/' $1 >> $SQGDIR/db/$filter/$2.diff; fi
+      if test -f $1.exclude;
+        then sed 's/^/-/' $1.exclude >> $SQGDIR/db/$filter/$2.diff; fi; }
+
+diffadd ()
+    { cat $source-blacklists/$filter/$1.diff>>$SQGDIR/db/$filter/$1.diff; }
+
+for filter in ads aggressive audio-video drugs gambling hacking porn violence warez;
+do
+  # Creates empty domain/url files to avoid emergency mode when compilling
+  # custom lists later.
+  dircreate $SQGDIR/db/$filter
+  mv blacklists/$filter/*.db $SQGDIR/db/$filter/  
+  filecreate $SQGDIR/db/$filter/domains; filecreate $SQGDIR/db/$filter/urls;
+  for source in de fr mesd
+  do
+    if test -f $source-blacklists/$filter/domains.diff;
+      then diffadd domains;
+      else diffgen $source-blacklists/$filter/domains domains;
+    fi
+    if test -f $source-blacklists/$filter/urls.diff;
+      then diffadd urls;
+      else diffgen $source-blacklists/$filter/urls urls;
+    fi
+  done
+done
+
+else
+# Much slower than using diffs, creates plain text urls/domains
+# Thanks Wolfgang for this part!
+echo Creating text files...
+for filter in ads aggressive audio-video drugs gambling hacking porn violence warez;
+do
+  if test ! -d $SQGDIR/db/$filter; then mkdir $SQGDIR/db/$filter; fi
+  for addrtype in domains urls;
+  do
+# We filter possible <LF>s using tr (comm is not working with that) and
+# comment lines which are confusing to read after sorting
+    cat blacklists/$filter/$addrtype > temp.txt
+    for source in de fr mesd
+    do
+      if test -f $source-blacklists/$filter/$addrtype;
+      then cat $source-blacklists/$filter/$addrtype >> temp.txt; fi
+    done
+    comm -2 -3 <(tr -d '\r' < temp.txt | grep -v "^#" | sort) <(tr -d '\r' < de-blacklists/$filter/$addrtype.exclude | grep -v "^#" | sort) > $SQGDIR/db/$filter/$addrtype
+  done
+done
+rm temp.txt
+
+fi
+
+
+
+echo Securing files...
+chownmod () { chown $1 $2
+              chmod ug+rw,o-rw $2
+	      chown -R $1 $2/*
+              chmod -R ug+rw,o-rw $2/*; }
+chownmod $USER:$USER $SQGDIR/db
+chownmod  root:root  $SQGDIR/tmp
+chownmod $USER:$USER $SQGLOG
+
+
+
+if ! test "$TEXT" = 1; then
+  if ! test "$1" = custom; then
+    echo Applying diffs...
+    /usr/bin/squidGuard -u -c $CONFIG 2>$SQGLOG/update.log
+    # Mandrake RPM: /usr/squidGuard/log/squidGuard.log will be used instead of
+    # update.log if directory exists
+  fi
+  custom-update
+else
+  echo Compiling text files...
+  /usr/bin/squidGuard -C all -c $CONFIG 2>$SQGLOG/update.log
+fi
+
+
+echo Reconfiguring Squid...; /usr/sbin/squid -k reconfigure
+

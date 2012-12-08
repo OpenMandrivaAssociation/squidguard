@@ -1,13 +1,22 @@
-%define rname squidGuard
+%define rname	squidGuard
+%define prerel	beta
+
+%if %{_use_internal_dependency_generator}
+%define __noautoreq 'perl\\((.*)\\)'
+%define __noautoprov 'perl\\((.*)\\)'
+%else
+%define _requires_exceptions perl(
+%define _provides_exceptions perl(
+%endif
 
 Summary:	Filter, redirector and access controller plugin for Squid
 Name:		squidguard
-Version:	1.4
-Release:	19
-License:	GPLv2
+Version:	1.5
+Release:	%{?prerel:0.%{prerel}.}2
+License:	GPL
 Group:		System/Servers
 URL:		http://www.squidguard.org
-Source0:	http://www.squidguard.org/Downloads/%{rname}-%{version}.tar.gz
+Source0:	http://www.squidguard.org/Downloads/%{?prerel:Devel/}%{rname}-%{version}%{?prerel:-%{prerel}}.tar.gz
 Source1:	%{rname}.conf.sample
 Source2:	blacklists-readme
 Source3:	%{rname}.cgi
@@ -17,20 +26,21 @@ Source6:	%{rname}.logrotate
 Patch0:		squidGuard-1.2.0.default_dir.patch
 Patch1:		squidGuard-DESTDIR.diff
 Patch2:		squidGuard-1.4-make_default_config_work.diff
-Patch3:		squidGuard-1.4-dnsbl.patch
-Patch4:		squidGuard-1.4-CVE-2009-3700.diff
-Patch5:		squidGuard-1.4-CVE-2009-3826.diff
-Patch6:		squidGuard-1.4-quoted_string_support.diff
-Patch7:		squidGuard-1.4-specialchars.diff
+
+#Debian patches
+Patch11:	04_update-links-in-doc-files.patch
+Patch12:	05_distclean-more-files.patch
+Patch13:	06_move-setuserinfo-to-sg-y.patch
+Patch15:	09_missing-content-after-percent-sign.patch
+Patch16:	10_use-newer-ldapsearch-of-denis.patch
+Patch17:	11_fix-for-clean-target-without-syslog.patch
 
 BuildRequires:	bison 
 BuildRequires:	db-devel
 BuildRequires:	flex
 BuildRequires:	openldap-devel
 Requires:	squid 
-Provides:	squidGuard = %{version}
-Obsoletes:	squidGuard
-Buildroot:	%{_tmppath}/%{rname}-%{version}-%{release}-buildroot
+Provides:	squidGuard = %{EVRD}
 
 %description
 SquidGuard is a combined filter, redirector and access controller plugin for
@@ -60,7 +70,7 @@ Neither squidGuard nor Squid can be used to
 
 %prep
 
-%setup -q -n %{rname}-%{version}
+%setup -q -n %{rname}-%{version}%{?prerel:-%{prerel}}
 
 # fix attribs
 find . -type d -perm 0750 -exec chmod 755 {} \;
@@ -69,11 +79,13 @@ find . -type f -perm 0640 -exec chmod 644 {} \;
 %patch0 -p1
 %patch1 -p0
 %patch2 -p0
-%patch3 -p1
-%patch4 -p0 -b .CVE-2009-3700
-%patch5 -p1 -b .CVE-2009-3826
-#patch6 -p2 -b .quotes
-#patch7 -p1 -b .special_chars
+
+%patch11 -p1
+%patch12 -p1
+%patch13 -p1
+%patch15 -p1
+%patch16 -p1
+%patch17 -p1
 
 cp %{SOURCE6} %{rname}.logrotate
 
@@ -137,7 +149,7 @@ cd -
 
 cp -a contrib/hostbyname/hostbyname $Q/contrib/
 cp -a contrib/sgclean/sgclean $Q/contrib/
-#cp -a contrib/squidGuardRobot/{squidGuardRobot,RobotUserAgent.pm} $Q/contrib/
+cp -a contrib/squidGuardRobot/{squidGuardRobot,RobotUserAgent.pm} $Q/contrib/
 
 cp -a samples/dest $Q/samples
 cp -a samples/*{.conf,.cgi} $Q/samples
@@ -193,9 +205,6 @@ mv %{_datadir}/%{rname}-%{version} %{_datadir}/%{rname}-%{version}.bk
 %triggerpostun -- squidGuard <= 1.2.0-13mdv2007.1
 mv %{_datadir}/%{rname}-%{version}.bk %{_datadir}/%{rname}-%{version}
 
-%clean
-rm -rf %{buildroot}
-
 %files
 %defattr(-,root,root)
 %doc COPYING GPL README README.LDAP ANNOUNCE CHANGELOG blacklists-readme doc/*.{html,gif,txt}
@@ -209,3 +218,139 @@ rm -rf %{buildroot}
 %{_datadir}/%{rname}-%{version}/db
 %dir %attr(-,squid,squid)/var/log/%{rname}
 %attr(-,squid,squid)/var/log/%{rname}/*
+
+
+%changelog
+* Mon Apr 11 2011 Funda Wang <fwang@mandriva.org> 1.4-15mdv2011.0
++ Revision: 652495
+- build with db 5.1
+
+* Sat Oct 16 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 1.4-14mdv2011.0
++ Revision: 585961
+- P7 update, trying to fix #60197
+- P7 update, trying to fix #60197
+
+* Thu Aug 05 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 1.4-13mdv2011.0
++ Revision: 566115
+- P6 test
+- P6 test
+
+* Mon Aug 02 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 1.4-12mdv2011.0
++ Revision: 565099
+- try to fix #60197
+
+* Mon Aug 02 2010 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 1.4-11mdv2011.0
++ Revision: 565069
+- try to fix #60197
+
+* Fri Jan 01 2010 Oden Eriksson <oeriksson@mandriva.com> 1.4-11mdv2010.1
++ Revision: 484727
+- rebuilt against bdb 4.8
+
+* Mon Nov 23 2009 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 1.4-10mdv2010.1
++ Revision: 469175
+- New P7 to let special chars such as !, &, ( and ) in strings
+
+* Mon Nov 23 2009 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 1.4-9mdv2010.1
++ Revision: 469173
+- New P6 for quotes support, this will let SG to accept non alphanumeric characters in parameters such as passwords
+
+* Fri Nov 06 2009 Oden Eriksson <oeriksson@mandriva.com> 1.4-8mdv2010.1
++ Revision: 461160
+- sync patches with 1.4-1.1mdv2009.1:
+ - P2: make the default config work
+ - P3: RBLDNS support
+ - P4: security fix for CVE-2009-3700
+ - P5: security fix for CVE-2009-3826
+- it's "url_rewrite_program" now...
+
+  + Luis Daniel Lucio Quiroz <dlucio@mandriva.org>
+    - Rediff P4
+
+* Tue Oct 20 2009 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 1.4-6mdv2010.0
++ Revision: 458468
+- New P4: Fixes two bypass problems with URLs having a length closed to the defined MAX_BUF value (4096).
+- release updated
+- Fixes a buffer overflow problem and prevents squidGuard from going into emergency mode when overlong URLs are encountered (they can be perfectly legal)
+
+* Tue Oct 06 2009 Oden Eriksson <oeriksson@mandriva.com> 1.4-4mdv2010.0
++ Revision: 454613
+- fix #46152 (mandrake-linux.com broken url in the default cgi script)
+
+* Fri Oct 02 2009 Oden Eriksson <oeriksson@mandriva.com> 1.4-3mdv2010.0
++ Revision: 452761
+- fix build
+- the lowercase mafia struck!
+- the lowercase mafia struck again!
+
+* Mon Jun 15 2009 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 1.4-2mdv2010.0
++ Revision: 386053
+- rebuild
+
+* Mon Jun 15 2009 Luis Daniel Lucio Quiroz <dlucio@mandriva.org> 1.4-1mdv2010.0
++ Revision: 386047
+- Patch2 for RBLDNS
+
+* Sat Mar 07 2009 Oden Eriksson <oeriksson@mandriva.com> 1.4-1mdv2009.1
++ Revision: 351703
+- 1.4
+- drop upstream patches
+- rediffed one patch
+
+* Mon Dec 15 2008 Oden Eriksson <oeriksson@mandriva.com> 1.3-2mdv2009.1
++ Revision: 314554
+- rediff fuzzy patches
+- rebuilt against db4.7
+
+* Tue Aug 12 2008 Oden Eriksson <oeriksson@mandriva.com> 1.3-1mdv2009.0
++ Revision: 271105
+- 1.3
+- fix spec file, install mess...
+- added 3 upstream patches
+
+* Wed Jun 18 2008 Thierry Vignaud <tv@mandriva.org> 1.2.1-3mdv2009.0
++ Revision: 225473
+- rebuild
+
+* Fri Dec 21 2007 Oden Eriksson <oeriksson@mandriva.com> 1.2.1-2mdv2008.1
++ Revision: 136303
+- rebuilt against new build deps
+
+  + Thierry Vignaud <tv@mandriva.org>
+    - kill re-definition of %%buildroot on Pixel's request
+
+* Thu Oct 11 2007 Oden Eriksson <oeriksson@mandriva.com> 1.2.1-1mdv2008.1
++ Revision: 96985
+- 1.2.1
+
+  + Thierry Vignaud <tv@mandriva.org>
+    - s/Mandrake/Mandriva/
+
+* Tue May 15 2007 Oden Eriksson <oeriksson@mandriva.com> 1.2.0-14mdv2008.0
++ Revision: 26874
+- sync changes with the 1.2.0-13.1mdv2007.1 package:
+  - fix the %%postun script and add some triggers so that
+    /usr/share/squidGuard-[ver] doesn't get completely removed
+    on an upgrade
+
+
+* Wed Mar 07 2007 Oden Eriksson <oeriksson@mandriva.com> 1.2.0-13mdv2007.0
++ Revision: 134473
+- Import squidGuard
+
+* Wed Mar 07 2007 Oden Eriksson <oeriksson@mandriva.com> 1.2.0-13mdv2007.1
+- bunzip patches
+
+* Sun May 28 2006 Stefan van der Eijk <stefan@eijk.nu> 1.2.0-12mdk
+- %%mkrel
+- fix URL of source
+
+* Sun Jan 01 2006 Mandriva Linux Team <http://www.mandrivaexpert.com/> 1.2.0-11mdk
+- Rebuild
+
+* Tue Apr 20 2004 Florin <florin@mandrakesoft.com> 1.2.0-10mdk
+- fix the logrotate bug #9526
+
+* Fri Apr 16 2004 Gwenole Beauchesne <gbeauchesne@mandrakesoft.com> 1.2.0-9mdk
+- fix build
+

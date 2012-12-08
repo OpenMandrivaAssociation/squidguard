@@ -1,0 +1,26 @@
+/var/log/squidGuard/squidGuard.log {
+    weekly
+    rotate 5
+    copytruncate
+    compress
+    notifempty
+    missingok
+}
+
+/var/log/squidGuard/advertising.log {
+    weekly
+    rotate 5
+    copytruncate
+    compress
+    notifempty
+    missingok
+
+}
+/var/log/squidGuard/squidGuard.error {
+    weekly
+    rotate 5
+    copytruncate
+    compress
+    notifempty
+    missingok
+}
