@@ -1,2 +1,4 @@
 sources:
-  "squidGuard-1.5-beta.tar.gz": d8cc472373fe068cfc45e8d9bdc2e0a0bba7c67b
+  blacklists.tgz: 4f886e669c9d265be489a4c5bfff73b1b6515c59
+  squidGuard-1.4.tar.gz: 0508ccb7db5c656b9952eacbcff2c956c01677d3
+  squidGuard-1.5-beta.tar.gz: d8cc472373fe068cfc45e8d9bdc2e0a0bba7c67b
