@@ -144,6 +144,12 @@ ln -s ../squidGuard/squidGuard.log  %{buildroot}%{_localstatedir}/log/squid/squi
 %post
 %_post_service %{name}
 
+
+echo "WARNING !!! WARNING !!! WARNING !!! WARNING !!!"
+echo ""
+echo "Modify the following line in the /etc/squid/squid.conf file:"
+echo "url_rewrite_program /usr/bin/squidGuard -c /etc/squid/squidGuard.conf"
+
 %preun
 %_preun_service %{name}
 
