@@ -7,7 +7,7 @@
 
 Name:			squidGuard
 Version:		1.4
-Release:		13
+Release:		14
 Summary:		Filter, redirector and access controller plugin for squid
 
 Group:			System/Servers
@@ -143,7 +143,7 @@ mkdir -p %{buildroot}%{_localstatedir}/log/squid
 ln -s ../squidGuard/squidGuard.log  %{buildroot}%{_localstatedir}/log/squid/squidGuard.log
 
 %post
-chown -R squid:squid %{buildroot}%{_localstatedir}/log/squidGuard
+chown -R squid:squid %{_localstatedir}/log/squidGuard
 %_post_service %{name}
 
 
