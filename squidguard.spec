@@ -36,7 +36,7 @@ URL:			http://www.squidguard.org/
 
 BuildRequires:		byacc
 BuildRequires:		bison
-BuildRequires:          db52-devel
+BuildRequires:          db5-devel
 BuildRequires:		openldap-devel
 BuildRequires:		flex
 Provides:		squidguard = %{version}-%{release}
