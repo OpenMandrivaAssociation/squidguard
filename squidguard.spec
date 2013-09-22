@@ -34,7 +34,7 @@ Patch9:			squidGuard-1.4-db5.patch
 
 URL:			http://www.squidguard.org/
 
-BuildRequires:		db5-devel
+BuildRequires:		db53-devel
 BuildRequires:		byacc
 BuildRequires:		bison
 BuildRequires:		openldap-devel
