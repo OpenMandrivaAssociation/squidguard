@@ -41,6 +41,7 @@ BuildRequires:		openldap-devel
 BuildRequires:		flex
 Provides:		squidguard = %{version}-%{release}
 Requires:		squid
+Requires(pre):	squid
 Requires(post): rpm-helper
 Requires(preun): rpm-helper
 Requires(postun): rpm-helper
@@ -140,6 +141,8 @@ sed -i "s,dest/adult/,blacklists/porn/,g" %{buildroot}%{_sysconfdir}/squid/squid
 mkdir -p %{buildroot}%{_localstatedir}/log/squidGuard
 mkdir -p %{buildroot}%{_localstatedir}/log/squid
 ln -s ../squidGuard/squidGuard.log  %{buildroot}%{_localstatedir}/log/squid/squidGuard.log
+
+%pre
 chown -R squid:squid %{buildroot}%{_localstatedir}/log/squidGuard
 
 %post
