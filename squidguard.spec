@@ -140,6 +140,7 @@ sed -i "s,dest/adult/,blacklists/porn/,g" %{buildroot}%{_sysconfdir}/squid/squid
 mkdir -p %{buildroot}%{_localstatedir}/log/squidGuard
 mkdir -p %{buildroot}%{_localstatedir}/log/squid
 ln -s ../squidGuard/squidGuard.log  %{buildroot}%{_localstatedir}/log/squid/squidGuard.log
+chown -R squid:squid %{buildroot}%{_localstatedir}/log/squidGuard
 
 %post
 %_post_service %{name}
