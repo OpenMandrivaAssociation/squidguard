@@ -7,7 +7,7 @@
 
 Name:			squidGuard
 Version:		1.4
-Release:		14
+Release:		15
 Summary:		Filter, redirector and access controller plugin for squid
 
 Group:			System/Servers
@@ -36,7 +36,7 @@ URL:			http://www.squidguard.org/
 
 BuildRequires:		byacc
 BuildRequires:		bison
-BuildRequires:          db5-devel
+BuildRequires:          db6-devel
 BuildRequires:		openldap-devel
 BuildRequires:		flex
 Provides:		squidguard = %{version}-%{release}
@@ -88,7 +88,7 @@ find . -type f -perm 0640 -exec chmod 644 {} \;
 
 %build
 %serverbuild_hardened
-%configure2_5x \
+%configure \
 	--with-sg-config=%{_sysconfdir}/squid/squidGuard.conf \
 	--with-sg-logdir=%{_var}/log/squidGuard \
 	--with-sg-dbhome=%{_dbhomedir} \
