@@ -7,7 +7,7 @@
 
 Name:			squidGuard
 Version:		1.4
-Release:		23
+Release:		24
 Summary:		Filter, redirector and access controller plugin for squid
 
 Group:			System/Servers
