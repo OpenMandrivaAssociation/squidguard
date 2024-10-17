@@ -32,7 +32,7 @@ Patch7:			squidGuard-1.4-20091015.patch
 Patch8:			squidGuard-1.4-20091019.patch
 Patch9:			squidGuard-1.4-db5.patch
 
-URL:			http://www.squidguard.org/
+URL:			https://www.squidguard.org/
 
 BuildRequires:		byacc
 BuildRequires:		bison
